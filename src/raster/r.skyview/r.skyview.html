@@ -16,6 +16,20 @@ visualization of horizontal planes and slopes. Openness values range from 0 to 2
 <h2>NOTES</h2>
 
 Module <em><a href="https://grass.osgeo.org/grass-stable/manuals/r.horizon.html">r.horizon</a></em> is used to compute elevation angles.
+<p>
+<em>r.horizon</em> does not compute horizon angles below the horizontal
+(it returns 0 instead), so with <em>r.horizon</em> alone openness cannot exceed 1.
+When flag <b>-o</b> is set and the addon
+<em><a href="r.horizon.neg.html">r.horizon.neg</a></em> is installed,
+<em>r.skyview</em> uses it instead of <em>r.horizon</em>; openness is then
+greater than 1 for cells that stand above their surroundings.
+If <em>r.horizon.neg</em> is not installed, <em>r.skyview</em> prints
+a warning and openness is limited to 1.
+<p>
+The openness value is 1 minus the mean sine of the horizon angle, so it is
+not an angle. To get openness as the mean zenith angle in degrees
+(as in Yokoyama et al. 2002), keep the horizon maps with <b>basename</b>
+and average 90 minus the horizon angle over the directions.
 
 
 <h2>EXAMPLES</h2>
@@ -36,6 +50,7 @@ r.skyview input=elevation output=elevation_skyview ndir=8
 
 <em>
 <a href="https://grass.osgeo.org/grass-stable/manuals/r.horizon.html">r.horizon</a>,
+<a href="r.horizon.neg.html">r.horizon.neg</a>,
 <a href="https://grass.osgeo.org/grass-stable/manuals/r.relief.html">r.relief</a>,
 <a href="r.shaded.pca.html">r.shaded.pca</a>,
 <a href="r.local.relief.html">r.local.relief</a>

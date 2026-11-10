@@ -19,6 +19,19 @@ Module
 *[r.horizon](https://grass.osgeo.org/grass-stable/manuals/r.horizon.html)*
 is used to compute elevation angles.
 
+*r.horizon* does not compute horizon angles below the horizontal (it
+returns 0 instead), so with *r.horizon* alone openness cannot exceed 1.
+When flag **-o** is set and the addon *[r.horizon.neg](r.horizon.neg.md)*
+is installed, *r.skyview* uses it instead of *r.horizon*; openness is
+then greater than 1 for cells that stand above their surroundings. If
+*r.horizon.neg* is not installed, *r.skyview* prints a warning and
+openness is limited to 1.
+
+The openness value is 1 minus the mean sine of the horizon angle, so it
+is not an angle. To get openness as the mean zenith angle in degrees
+(as in Yokoyama et al. 2002), keep the horizon maps with **basename**
+and average 90 minus the horizon angle over the directions.
+
 ## EXAMPLES
 
 We compute the skyview factor map of the North Carolina sample dataset
@@ -34,6 +47,7 @@ r.skyview input=elevation output=elevation_skyview ndir=8
 ## SEE ALSO
 
 *[r.horizon](https://grass.osgeo.org/grass-stable/manuals/r.horizon.html),
+[r.horizon.neg](r.horizon.neg.md),
 [r.relief](https://grass.osgeo.org/grass-stable/manuals/r.relief.html),
 [r.shaded.pca](r.shaded.pca.md), [r.local.relief](r.local.relief.md)*
 

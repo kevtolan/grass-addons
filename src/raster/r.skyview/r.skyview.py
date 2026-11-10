@@ -87,7 +87,7 @@
 # %flag
 # % key: o
 # % label: Compute openness instead of skyview factor
-# % description: Openness considers zenith angles > 90 degrees
+# % description: Openness considers zenith angles > 90 degrees (requires r.horizon.neg; without it openness is limited to 1)
 # %end
 # %flag
 # % key: n
@@ -199,8 +199,26 @@ def main():
             params["maxdistance"] = options["maxdistance"]
         if nprocs is not None:
             params["nprocs"] = nprocs
+        # Openness needs horizon angles below the horizontal (zenith angles
+        # > 90 degrees), which r.horizon does not compute (it returns 0).
+        # r.horizon.neg does. Skyview factor limits the angles to >= 0
+        # anyway, so r.horizon is enough for it.
+        horizon_module = "r.horizon"
+        if flags["o"]:
+            if gcore.find_program("r.horizon.neg", "--help"):
+                horizon_module = "r.horizon.neg"
+            else:
+                gcore.warning(
+                    _(
+                        "Module r.horizon.neg not found, using r.horizon."
+                        " r.horizon does not compute horizon angles below"
+                        " the horizontal, so openness will not exceed 1."
+                        " Install r.horizon.neg (g.extension r.horizon.neg)"
+                        " to get openness values greater than 1."
+                    )
+                )
         gcore.run_command(
-            "r.horizon",
+            horizon_module,
             elevation=elev,
             step=horizon_step,
             output=TMP_NAME,
@@ -232,7 +250,7 @@ def main():
     except CalledModuleError:
         msgr.fatal(
             _(
-                "r.horizon failed to compute horizon elevation "
+                "r.horizon(.neg) failed to compute horizon elevation "
                 "angle maps. Please report this problem to developers."
             )
         )
